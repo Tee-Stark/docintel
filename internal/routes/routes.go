@@ -8,7 +8,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func UserRoutes(r chi.Router) {
+func UserRoutes(r chi.Router, docHandler *handlers.DocumentHandler) {
 	r.Get("/alive", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("Welcome to my document intelligence app!"))
@@ -20,6 +20,5 @@ func UserRoutes(r chi.Router) {
 		w.Write([]byte(`{"message":"pong"}`))
 	})
 
-	r.Post("/upload-documents", handlers.UploadDocument)
-
+	r.Post("/upload-documents", docHandler.UploadDocument)
 }

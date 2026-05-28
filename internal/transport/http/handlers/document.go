@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -9,7 +8,6 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -26,12 +24,10 @@ func NewDocumentHandler(db *pgxpool.Pool, uploadDir string) *DocumentHandler {
 	}
 }
 
-func UploadDocument(w http.ResponseWriter, r *http.Request) {
-	var h DocumentHandler
-
+func (h *DocumentHandler) UploadDocument(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	err := r.ParseMultipartForm(20 << 20) // 20MB max memory
+	err := r.ParseMultipartForm(30 << 20) // 30MB max memory
 	if err != nil {
 		http.Error(w, "Invalid multipart form", http.StatusBadRequest)
 		return
@@ -44,8 +40,8 @@ func UploadDocument(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	if header.Size > 20*1024*1024 {
-		http.Error(w, "File too large. Max size is 20MB", http.StatusBadRequest)
+	if header.Size > 30*1024*1024 {
+		http.Error(w, "File too large. Max size is 30MB", http.StatusBadRequest)
 		return
 	}
 
@@ -78,8 +74,6 @@ func UploadDocument(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Temporary hardcoded user ID for now.
-	// Later, get this from JWT middleware.
 	userID := "00000000-0000-0000-0000-000000000001"
 
 	title := strings.TrimSuffix(header.Filename, filepath.Ext(header.Filename))
@@ -94,7 +88,7 @@ func UploadDocument(w http.ResponseWriter, r *http.Request) {
 	`
 
 	_, err = h.DB.Exec(
-		context.Background(),
+		ctx,
 		query,
 		documentID,
 		userID,
@@ -111,8 +105,8 @@ func UploadDocument(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusAccepted)
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusAccepted)
 
 	fmt.Fprintf(w, `{
 		"document_id": "%s",
@@ -120,6 +114,4 @@ func UploadDocument(w http.ResponseWriter, r *http.Request) {
 		"filename": "%s",
 		"size_bytes": %d
 	}`, documentID.String(), header.Filename, size)
-
-	_ = ctx
 }

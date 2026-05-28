@@ -1,12 +1,14 @@
 package config
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"os"
 	"time"
 
 	_ "github.com/lib/pq"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type DBConfig struct {
@@ -73,6 +75,27 @@ func containsParam(s, sub string) bool {
 		}
 	}
 	return false
+}
+
+func (c *DBConfig) ConnectPgxPool() (*pgxpool.Pool, error) {
+	var dsn string
+	if c.DatabaseURL != "" {
+		dsn = c.DatabaseURL
+	} else {
+		dsn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+			c.Host, c.Port, c.User, c.Password, c.DBName)
+	}
+
+	pool, err := pgxpool.New(context.Background(), dsn)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := pool.Ping(context.Background()); err != nil {
+		return nil, err
+	}
+
+	return pool, nil
 }
 
 func getEnvOrDefault(key, defaultValue string) string {
