@@ -1,6 +1,10 @@
 package domain
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type DocumentStatus string
 
@@ -12,7 +16,7 @@ const (
 )
 
 type Document struct {
-	ID               string
+	ID               uuid.UUID
 	UserID           string
 	Title            string
 	OriginalFilename string

@@ -3,7 +3,7 @@ package routes
 import (
 	"net/http"
 
-	"docintel/internal/transport/http/handlers"
+	"docintel/internal/transport/rest/handlers"
 
 	"github.com/go-chi/chi/v5"
 )
