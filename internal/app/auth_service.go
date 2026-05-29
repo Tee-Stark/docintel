@@ -38,23 +38,29 @@ func (s *AuthService) Register(ctx context.Context, email, name, password string
 	return err
 }
 
-func (s *AuthService) Login(ctx context.Context, email, password string) (*domain.User, error) {
+func (s *AuthService) Login(ctx context.Context, email, password string) (*domain.User, string, error) {
 	user, err := s.userRepo.FindUserByEmail(ctx, email)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	if user == nil {
-		return nil, errors.New(InvalidCredentialsErr) // Invalid credentials
+		return nil, "", errors.New(InvalidCredentialsErr) // Invalid credentials
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
 	if err != nil {
-		return nil, errors.New(InvalidCredentialsErr) // Invalid credentials
+		return nil, "", errors.New(InvalidCredentialsErr) // Invalid credentials
 	}
 
-	s.SaveUserSession(ctx, user.ID.String())
+	token, err := auth.GenerateToken(user.ID.String())
+	if err != nil {
+		return nil, "", err
+	}
+	if err := s.cache.Set(ctx, "session:"+token, user.ID.String(), 24*time.Hour); err != nil {
+		return nil, "", err
+	}
 
-	return user, nil
+	return user, token, nil
 }
 
 func (s *AuthService) SaveUserSession(ctx context.Context, userID string) (string, error) {

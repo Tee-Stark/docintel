@@ -30,7 +30,7 @@ type Cache interface {
 
 type AuthService interface {
 	Register(ctx context.Context, email, name, password string) error
-	Login(ctx context.Context, email, password string) (*User, error)
+	Login(ctx context.Context, email, password string) (*User, string, error)
 	SaveUserSession(ctx context.Context, userID string) (string, error)
 	ValidateUserSession(ctx context.Context, sessionID string) (string, error)
 	InvalidateUserSession(ctx context.Context, sessionID string) error

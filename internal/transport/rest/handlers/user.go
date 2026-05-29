@@ -59,7 +59,7 @@ func (h *UserHandler) HandleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.AuthService.Login(ctx, req.Email, req.Password)
+	user, token, err := h.AuthService.Login(ctx, req.Email, req.Password)
 	if err != nil {
 		if err.Error() == app.InvalidCredentialsErr {
 			response.WriteError(w, http.StatusUnauthorized, errors.New(app.InvalidCredentialsErr))
@@ -72,7 +72,8 @@ func (h *UserHandler) HandleLogin(w http.ResponseWriter, r *http.Request) {
 	resp := response.Response{
 		Message: "Login successful",
 		Data: map[string]interface{}{
-			"user": user,
+			"user":  user,
+			"token": token,
 		},
 	}
 
