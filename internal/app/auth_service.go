@@ -34,11 +34,12 @@ func (s *AuthService) Register(ctx context.Context, email, name, password string
 		PasswordHash: passwordHash,
 	}
 
-	return s.userRepo.Create(ctx, newUser)
+	err := s.userRepo.CreateUser(ctx, newUser)
+	return err
 }
 
 func (s *AuthService) Login(ctx context.Context, email, password string) (*domain.User, error) {
-	user, err := s.userRepo.FindByEmail(ctx, email)
+	user, err := s.userRepo.FindUserByEmail(ctx, email)
 	if err != nil {
 		return nil, err
 	}
@@ -51,24 +52,19 @@ func (s *AuthService) Login(ctx context.Context, email, password string) (*domai
 		return nil, errors.New(InvalidCredentialsErr) // Invalid credentials
 	}
 
-	SaveUserSession(ctx, s.cache, user.ID.String())
+	s.SaveUserSession(ctx, user.ID.String())
 
 	return user, nil
 }
 
-func hashPassword(password string) string {
-	hash, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	return string(hash)
-}
-
-func SaveUserSession(ctx context.Context, cache domain.Cache, userID string) (string, error) {
+func (s *AuthService) SaveUserSession(ctx context.Context, userID string) (string, error) {
 	token, err := auth.GenerateToken(userID)
 	if err != nil {
 		return "", err
 	}
 
 	sessionID := "session:" + token
-	err = cache.Set(ctx, sessionID, userID, 24*time.Hour)
+	err = s.cache.Set(ctx, sessionID, userID, 24*time.Hour)
 	if err != nil {
 		return "", err
 	}
@@ -76,8 +72,8 @@ func SaveUserSession(ctx context.Context, cache domain.Cache, userID string) (st
 	return sessionID, nil
 }
 
-func ValidateUserSession(ctx context.Context, cache domain.Cache, sessionID string) (string, error) {
-	userID, err := cache.Get(ctx, sessionID)
+func (s *AuthService) ValidateUserSession(ctx context.Context, sessionID string) (string, error) {
+	userID, err := s.cache.Get(ctx, sessionID)
 	if err != nil {
 		return "", err
 	}
@@ -85,6 +81,11 @@ func ValidateUserSession(ctx context.Context, cache domain.Cache, sessionID stri
 	return userID, nil
 }
 
-func InvalidateUserSession(ctx context.Context, cache domain.Cache, sessionID string) error {
-	return cache.Delete(ctx, sessionID)
+func (s *AuthService) InvalidateUserSession(ctx context.Context, sessionID string) error {
+	return s.cache.Delete(ctx, sessionID)
+}
+
+func hashPassword(password string) string {
+	hash, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	return string(hash)
 }

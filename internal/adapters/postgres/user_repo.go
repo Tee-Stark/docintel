@@ -8,15 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type UserRepository struct {
-	db *sql.DB
-}
-
-func NewUserRepository(db *sql.DB) *UserRepository {
-	return &UserRepository{db: db}
-}
-
-func (r *UserRepository) Create(ctx context.Context, user *domain.User) error {
+func (r *Repository) CreateUser(ctx context.Context, user *domain.User) error {
 	query := `INSERT INTO users (id, email, name, password_hash, created_at, updated_at) VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`
 	user_id, uuid_err := uuid.NewV7()
 	if uuid_err != nil {
@@ -27,7 +19,7 @@ func (r *UserRepository) Create(ctx context.Context, user *domain.User) error {
 	return exec_err
 }
 
-func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*domain.User, error) {
+func (r *Repository) FindUserByEmail(ctx context.Context, email string) (*domain.User, error) {
 	query := `SELECT id, email, name, password_hash, created_at, updated_at FROM users WHERE email = $1`
 	row := r.db.QueryRowContext(ctx, query, email)
 	var user domain.User
@@ -41,7 +33,7 @@ func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*domain
 	return &user, nil
 }
 
-func (r *UserRepository) FindByID(ctx context.Context, id uuid.UUID) (*domain.User, error) {
+func (r *Repository) FindUserByID(ctx context.Context, id uuid.UUID) (*domain.User, error) {
 	query := `SELECT id, email, name, created_at, updated_at FROM users WHERE id = $1`
 	row := r.db.QueryRowContext(ctx, query, id)
 	var user domain.User
@@ -55,7 +47,7 @@ func (r *UserRepository) FindByID(ctx context.Context, id uuid.UUID) (*domain.Us
 	return &user, nil
 }
 
-func (r *UserRepository) FindAll(ctx context.Context) ([]*domain.User, error) {
+func (r *Repository) FindAllUsers(ctx context.Context) ([]*domain.User, error) {
 	query := `SELECT id, email, name, created_at, updated_at FROM users`
 	rows, err := r.db.QueryContext(ctx, query)
 	if err != nil {
@@ -74,10 +66,10 @@ func (r *UserRepository) FindAll(ctx context.Context) ([]*domain.User, error) {
 	return users, nil
 }
 
-func (r *UserRepository) Update(ctx context.Context, user *domain.User) error {
+func (r *Repository) UpdateUser(ctx context.Context, user *domain.User) error {
 	panic("not implemented")
 }
 
-func (r *UserRepository) Delete(ctx context.Context, id uuid.UUID) error {
+func (r *Repository) DeleteUser(ctx context.Context, id uuid.UUID) error {
 	panic("not implemented")
 }

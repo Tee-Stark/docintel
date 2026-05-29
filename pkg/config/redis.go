@@ -8,9 +8,9 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-// NewClient creates a Redis client from the REDIS_URL environment variable.
+// NewRedisClient creates a Redis client from the REDIS_URL environment variable.
 // Falls back to localhost:6379 if the variable is not set.
-func NewClient() (*redis.Client, error) {
+func NewRedisClient() (*redis.Client, error) {
 	rawURL := os.Getenv("REDIS_URL")
 
 	if rawURL == "" {

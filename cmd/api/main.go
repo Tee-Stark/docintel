@@ -1,8 +1,10 @@
 package main
 
 import (
-	"docintel/internal/routes"
-	"docintel/internal/transport/http/handlers"
+	"docintel/internal/adapters/postgres"
+	"docintel/internal/adapters/redis"
+	"docintel/internal/app"
+	"docintel/internal/transport/rest"
 	"docintel/pkg/config"
 
 	"log"
@@ -29,16 +31,29 @@ func main() {
 		uploadDir = "./uploads"
 	}
 
-	docHandler := handlers.NewDocumentHandler(db, uploadDir)
+	repository := postgres.NewRepository(db)
+
+	redisClient, err := config.NewRedisClient()
+	if err != nil {
+		log.Fatalf("Failed to connect to Redis: %v", err)
+	}
+
+	cache := redis.NewCache(redisClient)
+
+	authService := app.NewAuthService(repository, cache)
+	docService := app.NewDocumentService(repository)
 
 	r := chi.NewRouter()
+	app := rest.NewAppServer(db, cache, repository, authService, docService, r)
+	StartServer(app)
+}
 
-	routes.UserRoutes(r)
-	routes.DocumentRoutes(r, docHandler)
+func StartServer(app *rest.AppServer) {
+	rest.SetUpRoutes(app)
 
 	log.Println("Server running on port 8080")
 
-	if err := http.ListenAndServe(":8080", r); err != nil {
+	if err := http.ListenAndServe(":8080", app.Router); err != nil {
 		log.Fatal(err)
 	}
 }
