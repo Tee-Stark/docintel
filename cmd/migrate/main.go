@@ -4,8 +4,11 @@ import (
 	"docintel/pkg/migrate"
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"strings"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -14,6 +17,10 @@ func main() {
 
 	// Flags for create command
 	name := createCmd.String("name", "", "Name of the migration")
+
+	if err := godotenv.Load(); err != nil {
+		log.Printf("Warning: .env file not found")
+	}
 
 	if len(os.Args) < 2 {
 		fmt.Println("Expected 'migrate' or 'create' subcommands")

@@ -34,7 +34,7 @@ func (c *DBConfig) ConnectDB() (*sql.DB, error) {
 	var dsn string
 	if c.DatabaseURL != "" {
 		dsn = c.DatabaseURL
-		if len(dsn) > 0 && !containsParam(dsn, "sslmode") {
+		if !containsParam(dsn, "sslmode") {
 			if containsParam(dsn, "?") {
 				dsn += "&sslmode=disable"
 			} else {
@@ -51,7 +51,6 @@ func (c *DBConfig) ConnectDB() (*sql.DB, error) {
 		return nil, err
 	}
 
-	// Connection pool settings
 	db.SetMaxOpenConns(25)
 	db.SetMaxIdleConns(5)
 	db.SetConnMaxLifetime(5 * time.Minute)
@@ -64,8 +63,6 @@ func (c *DBConfig) ConnectDB() (*sql.DB, error) {
 	return db, nil
 }
 
-// containsParam reports whether s contains the substring sub, used to check
-// whether a DSN or URL already has a given parameter.
 func containsParam(s, sub string) bool {
 	for i := 0; i <= len(s)-len(sub); i++ {
 		if s[i:i+len(sub)] == sub {
