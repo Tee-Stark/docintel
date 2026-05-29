@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"fmt"
 	"io"
 	"net/http"
@@ -9,15 +10,14 @@ import (
 	"strings"
 	"time"
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type DocumentHandler struct {
-	DB        *pgxpool.Pool
+	DB        *sql.DB
 	UploadDir string
 }
 
-func NewDocumentHandler(db *pgxpool.Pool, uploadDir string) *DocumentHandler {
+func NewDocumentHandler(db *sql.DB, uploadDir string) *DocumentHandler {
 	return &DocumentHandler{
 		DB:        db,
 		UploadDir: uploadDir,
@@ -27,7 +27,7 @@ func NewDocumentHandler(db *pgxpool.Pool, uploadDir string) *DocumentHandler {
 func (h *DocumentHandler) UploadDocument(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	err := r.ParseMultipartForm(30 << 20) // 30MB max memory
+	err := r.ParseMultipartForm(30 << 20)
 	if err != nil {
 		http.Error(w, "Invalid multipart form", http.StatusBadRequest)
 		return
@@ -50,7 +50,11 @@ func (h *DocumentHandler) UploadDocument(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	documentID := uuid.New()
+	documentID, err := uuid.NewV7()
+	if err != nil {
+		http.Error(w, "Failed to generate document ID", http.StatusInternalServerError)
+		return
+	}
 	storageKey := fmt.Sprintf("%s.pdf", documentID.String())
 
 	err = os.MkdirAll(h.UploadDir, os.ModePerm)
@@ -87,7 +91,7 @@ func (h *DocumentHandler) UploadDocument(w http.ResponseWriter, r *http.Request)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending', $8, $8)
 	`
 
-	_, err = h.DB.Exec(
+	_, err = h.DB.ExecContext(
 		ctx,
 		query,
 		documentID,

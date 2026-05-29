@@ -18,7 +18,7 @@ func main() {
 		log.Printf("Warning: .env file not found")
 	}
 
-	db, err := config.NewDBConfig().ConnectPgxPool()
+	db, err := config.NewDBConfig().ConnectDB()
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
@@ -33,7 +33,8 @@ func main() {
 
 	r := chi.NewRouter()
 
-	routes.UserRoutes(r, docHandler)
+	routes.UserRoutes(r)
+	routes.DocumentRoutes(r, docHandler)
 
 	log.Println("Server running on port 8080")
 

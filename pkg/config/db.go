@@ -1,14 +1,12 @@
 package config
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 	"os"
 	"time"
 
 	_ "github.com/lib/pq"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type DBConfig struct {
@@ -36,7 +34,7 @@ func (c *DBConfig) ConnectDB() (*sql.DB, error) {
 	var dsn string
 	if c.DatabaseURL != "" {
 		dsn = c.DatabaseURL
-		if len(dsn) > 0 && !containsParam(dsn, "sslmode") {
+		if !containsParam(dsn, "sslmode") {
 			if containsParam(dsn, "?") {
 				dsn += "&sslmode=disable"
 			} else {
@@ -53,7 +51,6 @@ func (c *DBConfig) ConnectDB() (*sql.DB, error) {
 		return nil, err
 	}
 
-	// Connection pool settings
 	db.SetMaxOpenConns(25)
 	db.SetMaxIdleConns(5)
 	db.SetConnMaxLifetime(5 * time.Minute)
@@ -66,8 +63,6 @@ func (c *DBConfig) ConnectDB() (*sql.DB, error) {
 	return db, nil
 }
 
-// containsParam reports whether s contains the substring sub, used to check
-// whether a DSN or URL already has a given parameter.
 func containsParam(s, sub string) bool {
 	for i := 0; i <= len(s)-len(sub); i++ {
 		if s[i:i+len(sub)] == sub {
@@ -75,27 +70,6 @@ func containsParam(s, sub string) bool {
 		}
 	}
 	return false
-}
-
-func (c *DBConfig) ConnectPgxPool() (*pgxpool.Pool, error) {
-	var dsn string
-	if c.DatabaseURL != "" {
-		dsn = c.DatabaseURL
-	} else {
-		dsn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-			c.Host, c.Port, c.User, c.Password, c.DBName)
-	}
-
-	pool, err := pgxpool.New(context.Background(), dsn)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := pool.Ping(context.Background()); err != nil {
-		return nil, err
-	}
-
-	return pool, nil
 }
 
 func getEnvOrDefault(key, defaultValue string) string {
