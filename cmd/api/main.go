@@ -8,7 +8,6 @@ import (
 	"docintel/pkg/config"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
@@ -24,11 +23,6 @@ func main() {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 	defer db.Close()
-
-	uploadDir := os.Getenv("UPLOAD_DIR")
-	if uploadDir == "" {
-		uploadDir = "./uploads"
-	}
 
 	repository := postgres.NewRepository(db)
 
