@@ -1,0 +1,9 @@
+POST  http://localhost:8081/api/v1/login
+Content-Type: application/json
+
+{
+    "email": "mercy2@yopmail.com",
+    "password": "Mercy20"
+
+
+} 

@@ -1,8 +1,7 @@
 package apitest
 POST  http://localhost:8080/upload-documents
 Content-Type: multipart/form-data
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDk2MDkwMjcsInVzZXJfaWQiOjF9.vsmlD0TUJsiOQioD-zRkNwrGeK9uoIKttc6dm4EU4O0
-
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMDE5ZTk5NjEtNGY3YS03MDJlLWFhYzMtY2I0ZTM2YThjZWFmIiwiZXhwIjoxNzgwNzc2MjA4LCJpYXQiOjE3ODA2ODk4MDh9.jfuDYdzGMr9LtxTz3x28IFhUBOI0MFpuW0PrcawBfzk
 {
     "file":"C:\\Users\\Admin\\Desktop\\test.pdf"
 
