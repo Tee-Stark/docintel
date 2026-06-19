@@ -32,7 +32,7 @@ func GenerateToken(userID string) (string, error) {
 	return token.SignedString([]byte(secret))
 }
 
-// ValidateToken parses and validates a JWT, returning the embedded doctor ID.
+// ValidateToken parses and validates a JWT, returning the embedded user ID.
 func ValidateToken(tokenString string) (string, error) {
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {

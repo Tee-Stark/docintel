@@ -2,9 +2,10 @@ package middleware
 
 import (
 	"context"
-	"docintel/internal/domain"
 	"net/http"
 	"strings"
+
+	"docintel/internal/domain"
 )
 
 type MiddleWare struct {

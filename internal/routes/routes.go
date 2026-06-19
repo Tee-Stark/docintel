@@ -3,9 +3,9 @@ package routes
 import (
 	"net/http"
 
-	"docintel/internal/transport/rest/handlers"
-
 	"github.com/go-chi/chi/v5"
+
+	"docintel/internal/transport/rest/handlers"
 )
 
 func UserRoutes(r chi.Router) {

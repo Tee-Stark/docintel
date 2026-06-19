@@ -1,13 +1,14 @@
 package handlers
 
 import (
-	"docintel/internal/app"
-	"docintel/internal/domain"
-	"docintel/internal/transport/rest/response"
 	"encoding/json"
 	"errors"
 	"net/http"
 	"strings"
+
+	"docintel/internal/app"
+	"docintel/internal/domain"
+	"docintel/internal/transport/rest/response"
 )
 
 type UserHandler struct {

@@ -1,16 +1,17 @@
 package main
 
 import (
-	"docintel/internal/adapters/postgres"
-	"docintel/internal/adapters/redis"
-	"docintel/internal/app"
-	"docintel/internal/transport/rest"
-	"docintel/pkg/config"
 	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
+
+	"docintel/internal/adapters/postgres"
+	"docintel/internal/adapters/redis"
+	"docintel/internal/app"
+	"docintel/internal/transport/rest"
+	"docintel/pkg/config"
 )
 
 func main() {

@@ -3,20 +3,22 @@ package postgres
 import (
 	"context"
 	"database/sql"
-	"docintel/internal/domain"
 
 	"github.com/google/uuid"
+
+	"docintel/internal/domain"
 )
 
 func (r *Repository) CreateUser(ctx context.Context, user *domain.User) error {
 	query := `INSERT INTO users (id, email, name, password_hash, created_at, updated_at) VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`
-	user_id, uuid_err := uuid.NewV7()
-	if uuid_err != nil {
-		return uuid_err
+
+	userID, err := uuid.NewV7()
+	if err != nil {
+		return err
 	}
 
-	_, exec_err := r.db.ExecContext(ctx, query, user_id, user.Email, user.Name, user.PasswordHash)
-	return exec_err
+	_, err = r.db.ExecContext(ctx, query, userID, user.Email, user.Name, user.PasswordHash)
+	return err
 }
 
 func (r *Repository) FindUserByEmail(ctx context.Context, email string) (*domain.User, error) {

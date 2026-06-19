@@ -1,13 +1,14 @@
 package handlers
 
 import (
-	"docintel/internal/domain"
-	"docintel/internal/transport/rest/response"
 	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/google/uuid"
+
+	"docintel/internal/domain"
+	"docintel/internal/transport/rest/response"
 )
 
 type DocumentHandler struct {
