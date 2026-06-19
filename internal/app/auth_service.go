@@ -2,12 +2,13 @@ package app
 
 import (
 	"context"
-	"docintel/internal/domain"
-	"docintel/pkg/auth"
 	"errors"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
+
+	"docintel/internal/domain"
+	"docintel/pkg/auth"
 )
 
 const (
@@ -44,12 +45,12 @@ func (s *AuthService) Login(ctx context.Context, email, password string) (*domai
 		return nil, "", err
 	}
 	if user == nil {
-		return nil, "", errors.New(InvalidCredentialsErr) // Invalid credentials
+		return nil, "", errors.New(InvalidCredentialsErr)
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
 	if err != nil {
-		return nil, "", errors.New(InvalidCredentialsErr) // Invalid credentials
+		return nil, "", errors.New(InvalidCredentialsErr)
 	}
 
 	token, err := auth.GenerateToken(user.ID.String())

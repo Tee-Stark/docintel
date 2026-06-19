@@ -6,10 +6,6 @@ import (
 	"docintel/internal/domain"
 )
 
-const (
-	UploadDir = "./uploads"
-)
-
 func (r *Repository) CreateDocument(ctx context.Context, doc *domain.Document) error {
 	query := `
 		INSERT INTO documents (
@@ -33,19 +29,3 @@ func (r *Repository) CreateDocument(ctx context.Context, doc *domain.Document) e
 
 	return err
 }
-
-// func (r *Repository) FindByID(ctx context.Context, id string) (*domain.Document, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *Repository) ListByUserID(ctx context.Context, userID string) ([]*domain.Document, error) {
-// 	panic("not implemented")
-// }
-
-// func (r *Repository) UpdateStatus(ctx context.Context, id string, status domain.DocumentStatus) error {
-// 	panic("not implemented")
-// }
-
-// func (r *Repository) Delete(ctx context.Context, id string) error {
-// 	panic("not implemented")
-// }

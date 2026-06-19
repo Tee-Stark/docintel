@@ -1,8 +1,7 @@
 package apitest
 POST  http://localhost:8080/upload-documents
 Content-Type: multipart/form-data
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDk2MDkwMjcsInVzZXJfaWQiOjF9.vsmlD0TUJsiOQioD-zRkNwrGeK9uoIKttc6dm4EU4O0
-
+Authorization: Bearer <your-jwt-token>
 {
     "file":"C:\\Users\\Admin\\Desktop\\test.pdf"
 

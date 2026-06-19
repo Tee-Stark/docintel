@@ -18,7 +18,6 @@ type AppServer struct {
 }
 
 func NewAppServer(db *sql.DB, cache domain.Cache, repo domain.Repository, authService domain.AuthService, docService domain.DocumentService, router *chi.Mux) *AppServer {
-
 	return &AppServer{
 		db:          db,
 		cache:       cache,

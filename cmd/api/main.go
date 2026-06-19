@@ -1,18 +1,17 @@
 package main
 
 import (
+	"log"
+	"net/http"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/joho/godotenv"
+
 	"docintel/internal/adapters/postgres"
 	"docintel/internal/adapters/redis"
 	"docintel/internal/app"
 	"docintel/internal/transport/rest"
 	"docintel/pkg/config"
-
-	"log"
-	"net/http"
-	"os"
-
-	"github.com/go-chi/chi/v5"
-	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -26,22 +25,21 @@ func main() {
 	}
 	defer db.Close()
 
-	uploadDir := os.Getenv("UPLOAD_DIR")
-	if uploadDir == "" {
-		uploadDir = "./uploads"
-	}
-
 	repository := postgres.NewRepository(db)
 
 	redisClient, err := config.NewRedisClient()
 	if err != nil {
 		log.Fatalf("Failed to connect to Redis: %v", err)
 	}
+	minioClient, bucketName, err := config.NewMinioClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	cache := redis.NewCache(redisClient)
 
 	authService := app.NewAuthService(repository, cache)
-	docService := app.NewDocumentService(repository)
+	docService := app.NewDocumentService(repository, minioClient, bucketName)
 
 	r := chi.NewRouter()
 	app := rest.NewAppServer(db, cache, repository, authService, docService, r)
@@ -51,9 +49,9 @@ func main() {
 func StartServer(app *rest.AppServer) {
 	rest.SetUpRoutes(app)
 
-	log.Println("Server running on port 8080")
+	log.Println("Server running on port 8081")
 
-	if err := http.ListenAndServe(":8080", app.Router); err != nil {
+	if err := http.ListenAndServe(":8081", app.Router); err != nil {
 		log.Fatal(err)
 	}
 }

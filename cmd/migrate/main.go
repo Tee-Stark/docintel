@@ -1,7 +1,6 @@
 package main
 
 import (
-	"docintel/pkg/migrate"
 	"flag"
 	"fmt"
 	"log"
@@ -9,6 +8,8 @@ import (
 	"strings"
 
 	"github.com/joho/godotenv"
+
+	"docintel/pkg/migrate"
 )
 
 func main() {

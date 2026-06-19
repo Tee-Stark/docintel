@@ -1,13 +1,14 @@
 package handlers
 
 import (
-	"docintel/internal/domain"
-	"docintel/internal/transport/rest/response"
 	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/google/uuid"
+
+	"docintel/internal/domain"
+	"docintel/internal/transport/rest/response"
 )
 
 type DocumentHandler struct {
@@ -51,7 +52,11 @@ func (h *DocumentHandler) UploadDocument(w http.ResponseWriter, r *http.Request)
 		response.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
-	userID := ctx.Value("userID").(string)
+	userID, ok := ctx.Value("userID").(string)
+	if !ok || userID == "" {
+		response.WriteError(w, http.StatusUnauthorized, fmt.Errorf("user not authenticated"))
+		return
+	}
 	mimeType := header.Header.Get("Content-Type")
 
 	doc := &domain.Document{
